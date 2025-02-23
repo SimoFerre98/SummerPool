@@ -74,11 +74,18 @@ if not st.session_state.utente_registrato:
                 st.session_state.data["voti"][nuovo_username] = {}
                 save_data(st.session_state.data)
                 st.success("Registrazione completata con successo! Effettua il login.")
+                # **INIZIO LINEE CODICE INSERITE: LOGIN AUTOMATICO DOPO REGISTRAZIONE**
+                st.session_state.utente_registrato = True
+                st.session_state.username = nuovo_username
+                # **FINE LINEE CODICE INSERITE: LOGIN AUTOMATICO DOPO REGISTRAZIONE**
                 st.session_state.azione_iniziale_selezionata = True
                 st.rerun()
     elif azione == "Login":
         username_login = st.text_input("Username per il login").lower()
         password_login = st.text_input("Password per il login", type="password")
+        # **INIZIO LINEA CODICE INSERITA: AVVISO PASSWORD DIMENTICATA**
+        st.caption("In caso di password dimenticata, contatta l'amministratore del sito.")
+        # **FINE LINEA CODICE INSERITA: AVVISO PASSWORD DIMENTICATA**
         if st.button("Login"):
             if username_login in st.session_state.utenti and st.session_state.utenti[username_login] == password_login:
                 st.session_state.utente_registrato = True
