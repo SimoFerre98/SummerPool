@@ -63,7 +63,6 @@ url_immagini_destinazioni = { # Dizionario: "Nome Destinazione": "URL Immagine O
 }
 # *** FINE DEFINIZIONE DIZIONARI COORDINATE E IMMAGINI ***
 
-
 def load_data():
     try:
         with open(DATABASE_FILE, "r") as f:
@@ -94,15 +93,29 @@ if 'tutti_i_voti' not in st.session_state:
     st.session_state.tutti_i_voti = st.session_state.data.get("voti", {})
 if 'destinazioni_selezionate_ordine' not in st.session_state:
     st.session_state.destinazioni_selezionate_ordine = [] # Inizializzazione lista ordinata
+if 'password_corretta_risultati' not in st.session_state:
+    st.session_state.password_corretta_risultati = False # Inizializza variabile sessione password risultati
 
-# *** INIZIO BLOCCO CODICE INSERITO: MENU LATERALE ***
+# *** INIZIO BLOCCO CODICE MODIFICATO: MENU LATERALE CON SEZIONE "RISULTATI" PROTETTA DA PASSWORD ***
 with st.sidebar:
     st.image("logo.png", width=100) # Logo nel sidebar (opzionale)
     sezione_selezionata = st.selectbox(
         "Menu di Navigazione",
-        ["Pool di Votazione", "Dettagli Destinazioni"] # Voci del menu
+        ["Pool di Votazione", "Dettagli Destinazioni", "Risultati"] # Voci del menu - AGGIUNTA "Risultati"
     )
-# *** FINE BLOCCO CODICE INSERITO: MENU LATERALE ***
+
+    # *** GESTIONE PASSWORD SEZIONE "RISULTATI" ***
+    if sezione_selezionata == "Risultati":
+        password_inserita = st.text_input("Password per visualizzare i risultati:", type="password")
+        if password_inserita == "2502":
+            st.session_state.password_corretta_risultati = True # Password corretta, imposta variabile di sessione
+        elif password_inserita: # Mostra errore solo se l'utente ha provato ad inserire qualcosa
+            st.error("Password errata. Accesso ai risultati negato.")
+            st.session_state.password_corretta_risultati = False # Password errata
+    else:
+        st.session_state.password_corretta_risultati = False # Reset password corretta se non nella sezione Risultati
+# *** FINE BLOCCO CODICE MODIFICATO: MENU LATERALE CON SEZIONE "RISULTATI" PROTETTA DA PASSWORD ***
+
 
 # Titolo principale (fuori dal sidebar)
 st.title("Sondaggio Destinazioni Vacanze")
@@ -289,3 +302,21 @@ elif sezione_selezionata == "Dettagli Destinazioni":  # Mostra questa sezione se
                 st.write("Immagine non disponibile") # Se non c'è URL, mostra messaggio
 
 # *** FINE BLOCCO CODICE MODIFICATO: SEZIONE "DETTAGLI DESTINAZIONI" - SINGOLA MAPPA ***
+
+# *** INIZIO BLOCCO CODICE MODIFICATO: SEZIONE "RISULTATI" - VISUALIZZA CODICE results.py ***
+elif sezione_selezionata == "Risultati":
+    if st.session_state.password_corretta_risultati: # Mostra risultati solo se password corretta
+        st.header("Codice Sorgente di results.py") # Intestazione che indica il codice
+
+        st.write("Questo è il codice sorgente del file `results.py` che conterrà la logica per visualizzare i risultati del sondaggio:")
+
+        try:
+            with open("results.py", "r") as file_results_py: # Apri e leggi il file results.py
+                codice_results_py = file_results_py.read() # Leggi il contenuto del file
+                st.code(codice_results_py, language='python') # Mostra il codice con st.code()
+        except FileNotFoundError:
+            st.error("File results.py non trovato. Assicurati che il file esista nella stessa cartella di pool.py.")
+
+    else:
+        st.info("Inserisci la password nel menu laterale per visualizzare i risultati.") # Messaggio se password non ancora inserita/corretta
+# *** FINE BLOCCO CODICE MODIFICATO: SEZIONE "RISULTATI" - VISUALIZZA CODICE results.py ***
