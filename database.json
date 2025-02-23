@@ -2,7 +2,8 @@
     "utenti": {
         "Simo": "Simo",
         "Ferremede": "Prova",
-        "ferremede": "Prova"
+        "ferremede": "Prova",
+        "giulia": "Giulia"
     },
     "voti": {
         "Simo": {
@@ -22,6 +23,12 @@
             "Isole Faroe": 3,
             "Istanbul": 2,
             "Baku": 1
+        },
+        "giulia": {
+            "Albania": 4,
+            "Egitto": 3,
+            "Istanbul": 2,
+            "Montenegro": 1
         }
     }
 }

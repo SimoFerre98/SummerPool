@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
-import matplotlib.pyplot as plt # Anche se non lo usiamo più, per ora lasciamolo, rimuoveremo importazioni inutilizzate alla fine
+import matplotlib.pyplot as plt
 
 DATABASE_FILE = "database.json"
 
@@ -29,8 +29,8 @@ if 'utente_registrato' not in st.session_state:
     st.session_state.utente_registrato = False
 if 'username' not in st.session_state:
     st.session_state.username = ''
-if 'azione_iniziale_selezionata' not in st.session_state: # Nuovo stato per azione iniziale
-    st.session_state.azione_iniziale_selezionata = False # Flag per evitare loop di renderizzazione
+if 'azione_iniziale_selezionata' not in st.session_state:
+    st.session_state.azione_iniziale_selezionata = False
 if 'data' not in st.session_state:
     st.session_state.data = load_data()
 if 'utenti' not in st.session_state:
@@ -48,13 +48,12 @@ st.image("logo.png", width=100)
 st.title("Sondaggio Destinazioni Vacanze")
 
 if not st.session_state.utente_registrato:
-    # Mostra sempre "Login" e "Registrazione" come prima azione
-    azione = st.radio("Seleziona l'azione:", ["Login", "Registrazione"]) # Nessun valore predefinito impostato, il primo sarà selezionato di default
+    azione = st.radio("Seleziona l'azione:", ["Login", "Registrazione"])
 
     if azione == "Registrazione":
         nuovo_username = st.text_input("Username per la registrazione").lower()
         nuova_password = st.text_input("Password per la registrazione", type="password")
-        if st.button("Registrati"): # Bottone di registrazione, azione singola
+        if st.button("Registrati"):
             if nuovo_username in st.session_state.utenti:
                 st.error("Username già esistente. Scegli un altro username.")
             else:
@@ -63,18 +62,18 @@ if not st.session_state.utente_registrato:
                 st.session_state.data["voti"][nuovo_username] = {}
                 save_data(st.session_state.data)
                 st.success("Registrazione completata con successo! Effettua il login.")
-                st.session_state.azione_iniziale_selezionata = True # Imposta il flag per evitare loop
-                st.experimental_rerun() # Rerunning per aggiornare la UI dopo la registrazione
+                st.session_state.azione_iniziale_selezionata = True
+                st.experimental_rerun()
     elif azione == "Login":
         username_login = st.text_input("Username per il login").lower()
         password_login = st.text_input("Password per il login", type="password")
-        if st.button("Login"): # Bottone di login, azione singola
+        if st.button("Login"):
             if username_login in st.session_state.utenti and st.session_state.utenti[username_login] == password_login:
                 st.session_state.utente_registrato = True
                 st.session_state.username = username_login
                 st.success(f"Login effettuato con successo, benvenuto {username_login}!")
-                st.session_state.azione_iniziale_selezionata = True # Imposta il flag per evitare loop
-                st.experimental_rerun() # Rerunning per aggiornare la UI dopo il login
+                st.session_state.azione_iniziale_selezionata = True
+                st.experimental_rerun()
             else:
                 st.error("Credenziali non valide. Riprova.")
 else:
@@ -82,35 +81,52 @@ else:
 
     st.header("Vota le tue 4 destinazioni preferite:")
     destinazioni_selezionate = []
+    punti_voto_assegnati = {} # Spostato qui, resettato ad ogni render
     colonne = st.columns(4)
-    punti_voto_assegnati = {}
+    punti_disponibili = [4, 3, 2, 1]
 
     # Carica i voti precedenti dell'utente, se esistono
     voti_precedenti = st.session_state.data["voti"].get(st.session_state.username, {})
     destinazioni_votate_precedentemente = list(voti_precedenti.keys())
 
-    punti_disponibili = [4, 3, 2, 1]
 
     for indice, destinazione in enumerate(destinazioni):
         with colonne[indice % 4]:
             default_value = destinazione in destinazioni_votate_precedentemente
-            checkbox_key = f"dest_{indice}_{st.session_state.username}"
-            checkbox_value = st.checkbox(destinazione, key=checkbox_key, value=default_value)
+            checkbox_key = f"dest_{indice}_{destinazione}" # Key semplificata: indice + destinazione
+            checkbox_value = st.checkbox(destinazione, key=checkbox_key, value=default_value) # Correzione: Rimossa label ridondante
 
             if checkbox_value:
                 destinazioni_selezionate.append(destinazione)
+
 
     if len(destinazioni_selezionate) > 4:
         st.warning("Hai selezionato più di 4 destinazioni. Solo le prime 4 saranno considerate per il voto.")
         destinazioni_selezionate = destinazioni_selezionate[:4]
 
-    # Assegna i punti alle destinazioni selezionate in base all'ordine di selezione
-    punti_voto_assegnati = {}
+    # Assegna i punti ALLE DESTINAZIONI SELEZIONATE in base all'ordine DI SELEZIONE
+    punti_voto_assegnati = {} # Riazzera qui per ricalcolare ad ogni render
     for i, destinazione in enumerate(destinazioni_selezionate):
         if i < 4:
             punti_voto_assegnati[destinazione] = punti_disponibili[i]
 
-    # Mostra le destinazioni selezionate con i punti accanto
+
+    # RIMOZIONE visualizzazione punti accanto alle checkbox:
+    # colonne_punteggio = st.columns(4)
+    # for indice, destinazione in enumerate(destinazioni):
+    #     with colonne[indice % 4]:
+    #         default_value = destinazione in destinazioni_votate_precedentemente
+    #         checkbox_key = f"dest_{indice}_{st.session_state.username}"
+    #         checkbox_value = st.checkbox(destinazione, label=destinazione, key=checkbox_key, value=default_value)
+
+    #     with colonne_punteggio[indice % 4]:
+    #          if checkbox_value and destinazione in punti_voto_assegnati:
+    #              punti = punti_voto_assegnati[destinazione]
+    #              st.write(f"**{punti} punti**")
+    #          else:
+    #              st.write("")
+
+    # RIPRISTINO visualizzazione elenco puntato sotto i checkbox:
     if destinazioni_selezionate:
         st.write("Destinazioni selezionate e punti:")
         for i, destinazione in enumerate(destinazioni_selezionate):
@@ -118,7 +134,7 @@ else:
             st.write(f"- {destinazione} ({punti} punti)")
 
 
-    if st.button("Conferma Voti"): # Bottone di conferma voti, azione singola
+    if st.button("Conferma Voti"):
         if len(destinazioni_selezionate) > 0:
             st.session_state.voti_utente = destinazioni_selezionate
 
@@ -158,15 +174,13 @@ else:
     else:
         st.info("Ancora nessun voto registrato.")
 
-    # Rimossa la sezione del grafico a torta "Partecipazione al Voto"
-
     st.header("Utenti che hanno votato") # Mantiene la sezione con il numero utenti votanti
     num_utenti_votanti = len(st.session_state.data["voti"])
     st.write(f"Numero di utenti che hanno espresso il loro voto: {num_utenti_votanti}")
 
-    if st.button("Logout"): # Bottone logout, azione singola
+    if st.button("Logout"):
         st.session_state.utente_registrato = False
         st.session_state.username = ''
         st.success("Logout effettuato con successo.")
-        st.session_state.azione_iniziale_selezionata = True # Imposta il flag per evitare loop
-        st.experimental_rerun() # Rerunning per aggiornare la UI dopo il logout
+        st.session_state.azione_iniziale_selezionata = True
+        st.experimental_rerun()
