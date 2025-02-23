@@ -48,6 +48,16 @@ st.image("logo.png", width=100)
 st.title("Sondaggio Destinazioni Vacanze")
 
 if not st.session_state.utente_registrato:
+    # **INIZIO BLOCCO CODICE INSERITO: AVVISO PRIVACY PASSWORD**
+    st.warning(
+        "**Avviso Importante sulla Privacy:** Le password inserite per la registrazione "
+        "non sono criptate e vengono memorizzate in chiaro. "
+        "Si raccomanda vivamente di **non utilizzare password personali o sensibili** "
+        "che usi per altri servizi importanti. "
+        "Il creatore di questo sito ha la possibilità tecnica di visualizzare le password inserite."
+    )
+    # **FINE BLOCCO CODICE INSERITO: AVVISO PRIVACY PASSWORD**
+
     azione = st.radio("Seleziona l'azione:", ["Login", "Registrazione"])
 
     if azione == "Registrazione":
@@ -63,7 +73,7 @@ if not st.session_state.utente_registrato:
                 save_data(st.session_state.data)
                 st.success("Registrazione completata con successo! Effettua il login.")
                 st.session_state.azione_iniziale_selezionata = True
-                st.experimental_rerun()
+                st.rerun() # Modifica: da st.experimental_rerun() a st.rerun()
     elif azione == "Login":
         username_login = st.text_input("Username per il login").lower()
         password_login = st.text_input("Password per il login", type="password")
@@ -73,11 +83,19 @@ if not st.session_state.utente_registrato:
                 st.session_state.username = username_login
                 st.success(f"Login effettuato con successo, benvenuto {username_login}!")
                 st.session_state.azione_iniziale_selezionata = True
-                st.rerun()# Vecchio codice st.experimental_rerun()
+                st.rerun() # Modifica: da st.experimental_rerun() a st.rerun()
             else:
                 st.error("Credenziali non valide. Riprova.")
 else:
     st.write(f"Benvenuto, {st.session_state.username}!")
+    # **INIZIO BLOCCO CODICE INSERITO: ISTRUZIONI VOTAZIONE**
+    st.info(
+        "**Come funziona la votazione:** Seleziona fino a 4 destinazioni che preferisci. "
+        "La **prima destinazione** che selezioni riceverà **4 punti**, la **seconda 3 punti**, "
+        "la **terza 2 punti** e la **quarta 1 punto**. "
+        "Se selezioni più di 4 destinazioni, verranno considerate solo le prime 4 in ordine di selezione."
+    )
+    # **FINE BLOCCO CODICE INSERITO: ISTRUZIONI VOTAZIONE**
 
     st.header("Vota le tue 4 destinazioni preferite:")
     destinazioni_selezionate = []
@@ -110,21 +128,6 @@ else:
         if i < 4:
             punti_voto_assegnati[destinazione] = punti_disponibili[i]
 
-
-    # RIMOZIONE visualizzazione punti accanto alle checkbox:
-    # colonne_punteggio = st.columns(4)
-    # for indice, destinazione in enumerate(destinazioni):
-    #     with colonne[indice % 4]:
-    #         default_value = destinazione in destinazioni_votate_precedentemente
-    #         checkbox_key = f"dest_{indice}_{st.session_state.username}"
-    #         checkbox_value = st.checkbox(destinazione, label=destinazione, key=checkbox_key, value=default_value)
-
-    #     with colonne_punteggio[indice % 4]:
-    #          if checkbox_value and destinazione in punti_voto_assegnati:
-    #              punti = punti_voto_assegnati[destinazione]
-    #              st.write(f"**{punti} punti**")
-    #          else:
-    #              st.write("")
 
     # RIPRISTINO visualizzazione elenco puntato sotto i checkbox:
     if destinazioni_selezionate:
@@ -183,4 +186,4 @@ else:
         st.session_state.username = ''
         st.success("Logout effettuato con successo.")
         st.session_state.azione_iniziale_selezionata = True
-        st.experimental_rerun()
+        st.rerun() # Modifica: da st.experimental_rerun() a st.rerun()
