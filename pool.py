@@ -41,6 +41,8 @@ if 'voti_utente' not in st.session_state:
     st.session_state.voti_utente = None
 if 'tutti_i_voti' not in st.session_state:
     st.session_state.tutti_i_voti = st.session_state.data.get("voti", {})
+if 'destinazioni_selezionate_ordine' not in st.session_state:
+    st.session_state.destinazioni_selezionate_ordine = [] # Inizializzazione lista ordinata
 
 # Aggiungi il logo qui
 st.image("logo.png", width=100)
@@ -73,7 +75,7 @@ if not st.session_state.utente_registrato:
                 save_data(st.session_state.data)
                 st.success("Registrazione completata con successo! Effettua il login.")
                 st.session_state.azione_iniziale_selezionata = True
-                st.rerun() # Modifica: da st.experimental_rerun() a st.rerun()
+                st.rerun()
     elif azione == "Login":
         username_login = st.text_input("Username per il login").lower()
         password_login = st.text_input("Password per il login", type="password")
@@ -83,7 +85,7 @@ if not st.session_state.utente_registrato:
                 st.session_state.username = username_login
                 st.success(f"Login effettuato con successo, benvenuto {username_login}!")
                 st.session_state.azione_iniziale_selezionata = True
-                st.rerun() # Modifica: da st.experimental_rerun() a st.rerun()
+                st.rerun()
             else:
                 st.error("Credenziali non valide. Riprova.")
 else:
@@ -98,8 +100,8 @@ else:
     # **FINE BLOCCO CODICE INSERITO: ISTRUZIONI VOTAZIONE**
 
     st.header("Vota le tue 4 destinazioni preferite:")
-    destinazioni_selezionate = []
-    punti_voto_assegnati = {} # Spostato qui, resettato ad ogni render
+    destinazioni_selezionate = [] # RIMOSSA - Usa st.session_state.destinazioni_selezionate_ordine
+    punti_voto_assegnati = {}
     colonne = st.columns(4)
     punti_disponibili = [4, 3, 2, 1]
 
@@ -111,11 +113,22 @@ else:
     for indice, destinazione in enumerate(destinazioni):
         with colonne[indice % 4]:
             default_value = destinazione in destinazioni_votate_precedentemente
-            checkbox_key = f"dest_{indice}_{destinazione}" # Key semplificata: indice + destinazione
-            checkbox_value = st.checkbox(destinazione, key=checkbox_key, value=default_value) # Correzione: Rimossa label ridondante
+            checkbox_key = f"dest_{indice}_{destinazione}"
+            checkbox_value = st.checkbox(destinazione, key=checkbox_key, value=default_value)
 
             if checkbox_value:
-                destinazioni_selezionate.append(destinazione)
+                # Se la checkbox è selezionata:
+                if destinazione not in st.session_state.destinazioni_selezionate_ordine:
+                    # Aggiungi alla lista ORDINATA SOLO se non è già presente
+                    st.session_state.destinazioni_selezionate_ordine.append(destinazione)
+            else:
+                # Se la checkbox è DESELEZIONATA:
+                if destinazione in st.session_state.destinazioni_selezionate_ordine:
+                    # Rimuovi dalla lista ORDINATA se presente
+                    st.session_state.destinazioni_selezionate_ordine.remove(destinazione)
+
+    # Usa la lista ORDINATA da session_state per le operazioni successive
+    destinazioni_selezionate = st.session_state.destinazioni_selezionate_ordine
 
 
     if len(destinazioni_selezionate) > 4:
@@ -123,7 +136,7 @@ else:
         destinazioni_selezionate = destinazioni_selezionate[:4]
 
     # Assegna i punti ALLE DESTINAZIONI SELEZIONATE in base all'ordine DI SELEZIONE
-    punti_voto_assegnati = {} # Riazzera qui per ricalcolare ad ogni render
+    punti_voto_assegnati = {}
     for i, destinazione in enumerate(destinazioni_selezionate):
         if i < 4:
             punti_voto_assegnati[destinazione] = punti_disponibili[i]
@@ -150,40 +163,4 @@ else:
         else:
             st.warning("Seleziona almeno una destinazione prima di confermare.")
 
-    def calcola_voti_totali(data_voti):
-        voti_totali_calcolati = {}
-        for username in data_voti:
-            for destinazione, punti in data_voti[username].items():
-                voti_totali_calcolati[destinazione] = voti_totali_calcolati.get(destinazione, 0) + punti
-        return voti_totali_calcolati
-
-    st.header("Risultati Sondaggio in Tempo Reale")
-    voti_totali_attuali = calcola_voti_totali(st.session_state.data["voti"])
-    if voti_totali_attuali:
-        risultati_df = pd.DataFrame(list(voti_totali_attuali.items()), columns=['Destinazione', 'Punteggio'])
-        risultati_df = risultati_df.sort_values(by='Punteggio', ascending=False)
-        st.bar_chart(risultati_df.set_index('Destinazione'))
-    else:
-        st.info("Nessun voto è stato ancora espresso.")
-
-    st.header("Voti di Tutti gli Utenti")
-    if st.session_state.data["voti"]:
-        voti_lista = []
-        for username, voti_utente in st.session_state.data["voti"].items():
-            dest_votate = ", ".join(voti_utente.keys())
-            voti_lista.append({"Username": username, "Destinazioni Votate": dest_votate})
-        voti_df = pd.DataFrame(voti_lista)
-        st.dataframe(voti_df)
-    else:
-        st.info("Ancora nessun voto registrato.")
-
-    st.header("Utenti che hanno votato") # Mantiene la sezione con il numero utenti votanti
-    num_utenti_votanti = len(st.session_state.data["voti"])
-    st.write(f"Numero di utenti che hanno espresso il loro voto: {num_utenti_votanti}")
-
-    if st.button("Logout"):
-        st.session_state.utente_registrato = False
-        st.session_state.username = ''
-        st.success("Logout effettuato con successo.")
-        st.session_state.azione_iniziale_selezionata = True
-        st.rerun() # Modifica: da st.experimental_rerun() a st.rerun()
+    # La sezione per il link a results.py è stata RIMOSSA da qui
