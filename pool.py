@@ -93,7 +93,7 @@ else:
     for indice, destinazione in enumerate(destinazioni):
         with colonne[indice % 4]:
             default_value = destinazione in destinazioni_votate_precedentemente
-            checkbox_key = f"dest_{indice}_{st.session_state.username}"
+            checkbox_key = f"dest_{indice}_{destinazione}" # Key semplificata: indice + destinazione
             checkbox_value = st.checkbox(destinazione, key=checkbox_key, value=default_value) # Correzione: Rimossa label ridondante
 
             if checkbox_value:
@@ -111,20 +111,28 @@ else:
             punti_voto_assegnati[destinazione] = punti_disponibili[i]
 
 
-    # Mostra le destinazioni selezionate CON I PUNTI AFFIANCO ALLE CHECKBOX
-    colonne_punteggio = st.columns(4) # Crea colonne separate per i punteggi
-    for indice, destinazione in enumerate(destinazioni):
-        with colonne[indice % 4]: # Usa le stesse colonne delle checkbox
-            default_value = destinazione in destinazioni_votate_precedentemente
-            checkbox_key = f"dest_{indice}_{st.session_state.username}"
-            checkbox_value = st.checkbox(destinazione, label=destinazione, key=checkbox_key, value=default_value) # Ripristina label qui
+    # RIMOZIONE visualizzazione punti accanto alle checkbox:
+    # colonne_punteggio = st.columns(4)
+    # for indice, destinazione in enumerate(destinazioni):
+    #     with colonne[indice % 4]:
+    #         default_value = destinazione in destinazioni_votate_precedentemente
+    #         checkbox_key = f"dest_{indice}_{st.session_state.username}"
+    #         checkbox_value = st.checkbox(destinazione, label=destinazione, key=checkbox_key, value=default_value)
 
-        with colonne_punteggio[indice % 4]: # Usa colonne separate per i punteggi, ma stesso indice
-             if checkbox_value and destinazione in punti_voto_assegnati: # Mostra punteggio solo se checkbox attivo e ha punteggio
-                 punti = punti_voto_assegnati[destinazione]
-                 st.write(f"**{punti} punti**") # Mostra il punteggio accanto, usa bold per evidenziare
-             else:
-                 st.write("") # Spazio vuoto se checkbox non attivo o non ha punteggio
+    #     with colonne_punteggio[indice % 4]:
+    #          if checkbox_value and destinazione in punti_voto_assegnati:
+    #              punti = punti_voto_assegnati[destinazione]
+    #              st.write(f"**{punti} punti**")
+    #          else:
+    #              st.write("")
+
+    # RIPRISTINO visualizzazione elenco puntato sotto i checkbox:
+    if destinazioni_selezionate:
+        st.write("Destinazioni selezionate e punti:")
+        for i, destinazione in enumerate(destinazioni_selezionate):
+            punti = punti_voto_assegnati.get(destinazione, 0)
+            st.write(f"- {destinazione} ({punti} punti)")
+
 
     if st.button("Conferma Voti"):
         if len(destinazioni_selezionate) > 0:
