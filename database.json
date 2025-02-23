@@ -1,0 +1,13 @@
+{
+    "utenti": {
+        "ferremede": "Prova"
+    },
+    "voti": {
+        "ferremede": {
+            "Albania": 4,
+            "Egitto": 3,
+            "Islanda": 2,
+            "Montenegro": 1
+        }
+    }
+}
