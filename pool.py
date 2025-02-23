@@ -73,7 +73,7 @@ if not st.session_state.utente_registrato:
                 st.session_state.username = username_login
                 st.success(f"Login effettuato con successo, benvenuto {username_login}!")
                 st.session_state.azione_iniziale_selezionata = True
-                st.experimental_rerun()
+                st.rerun()# Vecchio codice st.experimental_rerun()
             else:
                 st.error("Credenziali non valide. Riprova.")
 else:
