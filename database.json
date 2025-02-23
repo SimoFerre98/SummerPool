@@ -1,0 +1,20 @@
+{
+    "utenti": {
+        "Simo": "Simo",
+        "Ferremede": "Prova"
+    },
+    "voti": {
+        "Simo": {
+            "Egitto": 4,
+            "Portogallo": 3,
+            "Albania": 2,
+            "Kos": 1
+        },
+        "Ferremede": {
+            "Puglia": 4,
+            "Islanda": 3,
+            "Corsica": 2,
+            "Alicante/Benidorm": 1
+        }
+    }
+}

@@ -71,9 +71,15 @@ else:
     destinazioni_selezionate = []
     colonne = st.columns(4)
 
+    # Carica i voti precedenti dell'utente, se esistono
+    voti_precedenti = st.session_state.data["voti"].get(st.session_state.username, {})
+    destinazioni_votate_precedentemente = list(voti_precedenti.keys())
+
     for indice, destinazione in enumerate(destinazioni):
         with colonne[indice % 4]:
-            if st.checkbox(destinazione, label=destinazione, key=f"dest_{indice}_{st.session_state.username}"):
+            # Se l'utente ha votato precedentemente per questa destinazione, imposta il checkbox come attivo
+            default_value = destinazione in destinazioni_votate_precedentemente
+            if st.checkbox(destinazione, key=f"dest_{indice}_{st.session_state.username}", value=default_value):
                 destinazioni_selezionate.append(destinazione)
 
     if len(destinazioni_selezionate) > 4:
@@ -89,7 +95,7 @@ else:
             for i, dest in enumerate(destinazioni_selezionate):
                 voti_con_valore[dest] = punti_voto[i] if i < 4 else 0
 
-            st.session_state.data["voti"][st.session_state.username] = voti_con_valore
+            st.session_state.data["voti"][st.session_state.username] = voti_con_valore # Sovrascrivi i voti precedenti
             save_data(st.session_state.data)
             st.success("Voti registrati con successo!")
             del st.session_state.voti_utente # Resetta voti utente in sessione dopo averli salvati
@@ -123,6 +129,10 @@ else:
     else:
         st.info("Ancora nessun voto registrato.")
 
+    # Nuova sezione per il conteggio degli utenti votanti
+    st.header("Utenti che hanno votato")
+    num_utenti_votanti = len(st.session_state.data["voti"])
+    st.write(f"Numero di utenti che hanno espresso il loro voto: {num_utenti_votanti}")
 
     if st.button("Logout"):
         st.session_state.utente_registrato = False
