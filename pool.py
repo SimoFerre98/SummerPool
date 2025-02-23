@@ -1,14 +1,17 @@
 import streamlit as st
 import pandas as pd
 import json
+import matplotlib.pyplot as plt
 
 DATABASE_FILE = "database.json"
 
+# Ordina le destinazioni alfabeticamente
 destinazioni = [
-    "Cipro", "Ibiza-Formentera", "Mykonos", "Egitto", "Sicilia", "Puglia", "Malta", "Portogallo",
-    "Islanda", "Corsica", "Albania", "Montenegro", "Alicante/Benidorm", "Andalucia", "Kos", "Bangkock",
-    "Amsterdam/Copenhagen", "Isole Faroe", "Istanbul", "Baku", "Marocco"
+    "Albania", "Alicante/Benidorm", "Amsterdam/Copenhagen", "Andalucia", "Baku", "Bangkock", "Corsica",
+    "Cipro", "Egitto", "Ibiza-Formentera", "Islanda", "Isole Faroe", "Istanbul", "Kos", "Malta",
+    "Marocco", "Montenegro", "Mykonos", "Portogallo", "Puglia", "Sicilia"
 ]
+destinazioni.sort() # Ordina la lista in-place
 
 def load_data():
     try:
@@ -31,11 +34,14 @@ if 'data' not in st.session_state:
 if 'utenti' not in st.session_state:
     st.session_state.utenti = st.session_state.data.get("utenti", {})
 if 'voti_totali' not in st.session_state:
-    st.session_state.voti_totali = {} # Non usato più direttamente, calcolato dinamicamente
+    st.session_state.voti_totali = {}
 if 'voti_utente' not in st.session_state:
     st.session_state.voti_utente = None
 if 'tutti_i_voti' not in st.session_state:
     st.session_state.tutti_i_voti = st.session_state.data.get("voti", {})
+
+# Aggiungi il logo qui (assicurati di avere un file logo.png nella stessa cartella o modifica il percorso)
+st.image("logo.png", width=100) # Regola la larghezza a piacere
 
 st.title("Sondaggio Destinazioni Vacanze")
 
@@ -43,7 +49,7 @@ if not st.session_state.utente_registrato:
     azione = st.radio("Seleziona l'azione:", ["Login", "Registrazione"])
 
     if azione == "Registrazione":
-        nuovo_username = st.text_input("Username per la registrazione")
+        nuovo_username = st.text_input("Username per la registrazione").lower()
         nuova_password = st.text_input("Password per la registrazione", type="password")
         if st.button("Registrati"):
             if nuovo_username in st.session_state.utenti:
@@ -51,11 +57,11 @@ if not st.session_state.utente_registrato:
             else:
                 st.session_state.utenti[nuovo_username] = nuova_password
                 st.session_state.data["utenti"][nuovo_username] = nuova_password
-                st.session_state.data["voti"][nuovo_username] = {} # Inizializza voti utente
+                st.session_state.data["voti"][nuovo_username] = {}
                 save_data(st.session_state.data)
                 st.success("Registrazione completata con successo! Effettua il login.")
     elif azione == "Login":
-        username_login = st.text_input("Username per il login")
+        username_login = st.text_input("Username per il login").lower()
         password_login = st.text_input("Password per il login", type="password")
         if st.button("Login"):
             if username_login in st.session_state.utenti and st.session_state.utenti[username_login] == password_login:
@@ -70,35 +76,51 @@ else:
     st.header("Vota le tue 4 destinazioni preferite:")
     destinazioni_selezionate = []
     colonne = st.columns(4)
+    punti_voto_assegnati = {} # Dizionario per tenere traccia dei punti assegnati a ogni destinazione selezionata
 
     # Carica i voti precedenti dell'utente, se esistono
     voti_precedenti = st.session_state.data["voti"].get(st.session_state.username, {})
     destinazioni_votate_precedentemente = list(voti_precedenti.keys())
 
+    punti_disponibili = [4, 3, 2, 1] # Punti disponibili per l'assegnazione
+
     for indice, destinazione in enumerate(destinazioni):
         with colonne[indice % 4]:
-            # Se l'utente ha votato precedentemente per questa destinazione, imposta il checkbox come attivo
             default_value = destinazione in destinazioni_votate_precedentemente
-            if st.checkbox(destinazione, key=f"dest_{indice}_{st.session_state.username}", value=default_value):
+            checkbox_key = f"dest_{indice}_{st.session_state.username}"
+            checkbox_value = st.checkbox(destinazione, key=checkbox_key, value=default_value)
+
+            if checkbox_value:
                 destinazioni_selezionate.append(destinazione)
 
     if len(destinazioni_selezionate) > 4:
         st.warning("Hai selezionato più di 4 destinazioni. Solo le prime 4 saranno considerate per il voto.")
         destinazioni_selezionate = destinazioni_selezionate[:4]
 
+    # Assegna i punti alle destinazioni selezionate in base all'ordine di selezione
+    punti_voto_assegnati = {}
+    for i, destinazione in enumerate(destinazioni_selezionate):
+        if i < 4:
+            punti_voto_assegnati[destinazione] = punti_disponibili[i]
+
+    # Mostra le destinazioni selezionate con i punti accanto
+    if destinazioni_selezionate:
+        st.write("Destinazioni selezionate e punti:")
+        for i, destinazione in enumerate(destinazioni_selezionate):
+            punti = punti_voto_assegnati.get(destinazione, 0) # Ottieni i punti assegnati, 0 se non selezionata tra le prime 4
+            st.write(f"- {destinazione} ({punti} punti)")
+
+
     if st.button("Conferma Voti"):
         if len(destinazioni_selezionate) > 0:
             st.session_state.voti_utente = destinazioni_selezionate
 
-            voti_con_valore = {}
-            punti_voto = [4, 3, 2, 1]
-            for i, dest in enumerate(destinazioni_selezionate):
-                voti_con_valore[dest] = punti_voto[i] if i < 4 else 0
+            voti_con_valore = punti_voto_assegnati # Usa direttamente i punti calcolati sopra
 
-            st.session_state.data["voti"][st.session_state.username] = voti_con_valore # Sovrascrivi i voti precedenti
+            st.session_state.data["voti"][st.session_state.username] = voti_con_valore
             save_data(st.session_state.data)
             st.success("Voti registrati con successo!")
-            del st.session_state.voti_utente # Resetta voti utente in sessione dopo averli salvati
+            del st.session_state.voti_utente
         else:
             st.warning("Seleziona almeno una destinazione prima di confermare.")
 
@@ -122,16 +144,32 @@ else:
     if st.session_state.data["voti"]:
         voti_lista = []
         for username, voti_utente in st.session_state.data["voti"].items():
-            dest_votate = ", ".join(voti_utente.keys()) # Ottieni solo i nomi delle destinazioni votate
+            dest_votate = ", ".join(voti_utente.keys())
             voti_lista.append({"Username": username, "Destinazioni Votate": dest_votate})
         voti_df = pd.DataFrame(voti_lista)
         st.dataframe(voti_df)
     else:
         st.info("Ancora nessun voto registrato.")
 
-    # Nuova sezione per il conteggio degli utenti votanti
-    st.header("Utenti che hanno votato")
+    # Grafico a torta utenti votanti
+    st.header("Partecipazione al Voto")
     num_utenti_votanti = len(st.session_state.data["voti"])
+    num_utenti_registrati = len(st.session_state.data["utenti"])
+    num_utenti_non_votanti = num_utenti_registrati - num_utenti_votanti
+
+    labels = 'Hanno Votato', 'Non Hanno Votato'
+    sizes = [num_utenti_votanti, num_utenti_non_votanti]
+    colors = ['lightskyblue', 'lightcoral']
+    explode = (0.1, 0)
+
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%',
+            shadow=True, startangle=90)
+    ax1.axis('equal')
+
+    st.pyplot(fig1)
+
+    st.header("Utenti che hanno votato")
     st.write(f"Numero di utenti che hanno espresso il loro voto: {num_utenti_votanti}")
 
     if st.button("Logout"):
