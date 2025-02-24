@@ -1,27 +1,4 @@
 {
-    "utenti": {
-        "simo": "Simo",
-        "giulia": "Giulia",
-        "ciao": "Ciao"
-    },
-    "voti": {
-        "simo": {
-            "Albania": 4,
-            "Bangkock": 3,
-            "Islanda": 2,
-            "Puglia": 1
-        },
-        "giulia": {
-            "Bangkock": 4,
-            "Islanda": 3,
-            "Mykonos": 2,
-            "Puglia": 1
-        },
-        "ciao": {
-            "Montenegro": 4,
-            "Istanbul": 3,
-            "Egitto": 2,
-            "Baku": 1
-        }
-    }
+    "utenti": {},
+    "voti": {}
 }
