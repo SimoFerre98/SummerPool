@@ -2,17 +2,8 @@ import streamlit as st
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
-import config # Importa il file di configurazione
-
-DATABASE_FILE = "database.json" # Assicurati che sia lo stesso nome file di pool.py
-
-def load_data(): # Copia ANCHE la funzione load_data da pool.py
-    try:
-        with open(DATABASE_FILE, "r") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        data = {"utenti": {}, "voti": {}}
-    return data
+import config
+from data_manager import load_data
 
 def calcola_voti_totali(data_voti):
     voti_totali_calcolati = {}
@@ -21,31 +12,41 @@ def calcola_voti_totali(data_voti):
             voti_totali_calcolati[destinazione] = voti_totali_calcolati.get(destinazione, 0) + punti
     return voti_totali_calcolati
 
-def visualizza_risultati_protetti(): # NUOVA funzione per gestire password e visualizzazione
+def visualizza_risultati_protetti():
     password_inserita = st.text_input("Password per visualizzare i risultati:", type="password")
-    if password_inserita == config.PASSWORD_RISULTATI: # Usa la password da config.py
+    if password_inserita == config.PASSWORD_RISULTATI:
         st.session_state.password_corretta_risultati = True
     elif password_inserita:
         st.error("Password errata. Accesso ai risultati negato.")
         st.session_state.password_corretta_risultati = False
-    else: # Caso in cui non è stata inserita la password
+    else:
         st.session_state.password_corretta_risultati = False
 
-    if st.session_state.get('password_corretta_risultati', False): # Controlla se la password è corretta (usando get per evitare errori se non inizializzato)
-        st.title("Risultati Sondaggio Destinazioni Vacanze (Visualizzazione Riservata)") # Titolo per results.py
+    if st.session_state.get('password_corretta_risultati', False):
+        st.title("Vediamo un pò dove si và...")
 
-        st.session_state.data = load_data() # Carica i dati in results.py, come fai in pool.py
+        st.session_state.data = load_data()
 
-        st.header("Risultati Sondaggio in Tempo Reale")
+        st.header("Risultati Sondaggio")
+
         voti_totali_attuali = calcola_voti_totali(st.session_state.data["voti"])
         if voti_totali_attuali:
             risultati_df = pd.DataFrame(list(voti_totali_attuali.items()), columns=['Destinazione', 'Punteggio'])
-            risultati_df = risultati_df.sort_values(by='Punteggio', ascending=False)
-            st.bar_chart(risultati_df.set_index('Destinazione'))
+            risultati_df_ordinato = risultati_df.sort_values(by='Punteggio', ascending=False)
+
+            vincitore_punteggio = risultati_df_ordinato['Punteggio'].max()
+            vincitori_destinazioni = risultati_df_ordinato[risultati_df_ordinato['Punteggio'] == vincitore_punteggio]['Destinazione'].tolist()
+
+            # *** MODIFICA CHIAVE: RIMOSSO COMPLETAMENTE color=colori_barre ***
+            st.bar_chart(risultati_df_ordinato.set_index('Destinazione'), height=400) # Grafico a barre SENZA colori personalizzati
+
+            # *** INIZIO BLOCCO CODICE AGGIUNTO: TESTO VINCITORI SOTTO GRAFICO ***
+            st.write(f"**Destinazione/i vincitrice/i:** {', '.join(vincitori_destinazioni)} con {vincitore_punteggio} punti!") # Indica la/le destinazione/i vincitrice/i
+            # *** FINE BLOCCO CODICE AGGIUNTO: TESTO VINCITORI SOTTO GRAFICO ***
         else:
             st.info("Nessun voto è stato ancora espresso.")
 
-        st.header("Voti di Tutti gli Utenti")
+        st.header("Votanti")
         if st.session_state.data["voti"]:
             voti_lista = []
             for username, voti_utente in st.session_state.data["voti"].items():
@@ -56,14 +57,13 @@ def visualizza_risultati_protetti(): # NUOVA funzione per gestire password e vis
         else:
             st.info("Ancora nessun voto registrato.")
 
-        st.header("Utenti che hanno votato") # Copia ANCHE la sezione "Utenti che hanno votato" da pool.py (opzionale, se vuoi mostrarla anche qui)
+        st.header("Numero di Persone Votanti")
         num_utenti_votanti = len(st.session_state.data["voti"])
-        st.write(f"Numero di utenti che hanno espresso il loro voto: {num_utenti_votanti}")
-    elif password_inserita: # Se la password è stata inserita ma non è corretta
-        pass # L'errore è già gestito sopra nella condizione elif password_inserita == config.PASSWORD_RISULTATI:
-    else: # Se non è stata inserita la password (e non è corretta, condizione implicita)
+        st.write(f"Voti --> {num_utenti_votanti}")
+    elif password_inserita:
+        pass
+    else:
         st.info("Inserisci la password nel menu laterale per visualizzare i risultati.")
 
-
-if __name__ == "__main__": # Solo se results.py viene eseguito direttamente (per test locali)
-    visualizza_risultati_protetti() # Chiama la funzione per visualizzare i risultati protetti
+if __name__ == "__main__":
+    visualizza_risultati_protetti()

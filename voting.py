@@ -2,7 +2,7 @@ import streamlit as st
 from data_manager import save_data # Importa la funzione per salvare i dati
 
 def visualizza_pool_votazione(destinazioni): # Riceve la lista delle destinazioni come argomento
-    st.write(f"Benvenuto, {st.session_state.username}!")
+    st.write(f"Benvenuto/a, {st.session_state.username}!")
     st.info(
         "**Come funziona la votazione:** Seleziona fino a 4 destinazioni che preferisci. "
         "La **prima destinazione** che selezioni riceverà **4 punti**, la **seconda 3 punti**, "

@@ -31,15 +31,14 @@ if 'destinazioni_selezionate_ordine' not in st.session_state:
 if 'password_corretta_risultati' not in st.session_state:
     st.session_state.password_corretta_risultati = False
 
-# *** INIZIO BLOCCO CODICE MODIFICATO: MENU LATERALE - AGGIUNTO LOGOUT BUTTON - RIMOSSA CHIAMATA results_view ***
+# *** INIZIO BLOCCO CODICE MODIFICATO: MENU LATERALE - RIMOSSO HAMBURGER ICON - AGGIUNTO LOGOUT BUTTON ***
 with st.sidebar:
     st.image("logo.png", width=100) # Logo nel sidebar (opzionale)
     sezione_selezionata = st.selectbox(
-        "Menu di Navigazione ☰", # Aggiunto carattere "☰" per rendere più visibile il menu
+        "Menu di Navigazione", # RIMOSSO carattere "☰" - Ora solo testo semplice
         ["Pool di Votazione", "Dettagli Destinazioni", "Risultati"] # Voci del menu
     )
     st.session_state.sezione_selezionata = sezione_selezionata # Salva sezione selezionata in session_state per results_view
-    # results_view.visualizza_sezione_risultati() # RIMOSSA la chiamata a results_view
 
     # *** AGGIUNTO BOTTONE LOGOUT NEL MENU LATERALE ***
     if st.session_state.utente_registrato: # Mostra Logout solo se utente è loggato
@@ -51,10 +50,22 @@ with st.sidebar:
             st.session_state.voti_utente = None # Resetta voti utente
             st.success("Logout effettuato con successo.")
             st.rerun()
-# *** FINE BLOCCO CODICE MODIFICATO: MENU LATERALE - AGGIUNTO LOGOUT BUTTON - RIMOSSA CHIAMATA results_view ***
+# *** FINE BLOCCO CODICE MODIFICATO: MENU LATERALE - RIMOSSO HAMBURGER ICON - AGGIUNTO LOGOUT BUTTON ***
 
 # Titolo principale (fuori dal sidebar)
 st.title("Sondaggio Destinazioni Vacanze")
+
+# *** INIZIO BLOCCO CODICE AGGIUNTO: TESTO INTRODUTTIVO SIDEBAR ***
+st.markdown(
+    """
+    **Benvenuto al Sondaggio!** 👋
+    Per navigare tra le sezioni (Pool di Votazione, Dettagli Destinazioni, Risultati),
+    utilizza il menu **"Menu di Navigazione"** situato nel pannello laterale a sinistra.
+    _(Se il pannello laterale è chiuso, clicca sull'icona ☰ in alto a sinistra per aprirlo)._
+    """
+)
+# *** FINE BLOCCO CODICE AGGIUNTO: TESTO INTRODUTTIVO SIDEBAR ***
+
 
 # *** SEZIONE "POOL DI VOTAZIONE" - CHIAMA voting.py ***
 if sezione_selezionata == "Pool di Votazione":
