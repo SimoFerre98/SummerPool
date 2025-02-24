@@ -62,7 +62,7 @@ if st.session_state.sezione_selezionata == "Pool di Votazione": # MOSTRA TESTO S
         **Benvenuto al Sondaggio!** 👋
         Per navigare tra le sezioni (Pool di Votazione, Dettagli Destinazioni, Risultati),
         utilizza il menu **"Menu di Navigazione"** situato nel pannello laterale a sinistra.
-        _(Se il pannello laterale è chiuso, clicca sull'icona ☰ in alto a sinistra per aprirlo)._
+        _(Se il pannello laterale è chiuso, clicca sull'icona > in alto a sinistra per aprirlo)._
         """
     )
 # *** FINE BLOCCO CODICE MODIFICATO: TESTO INTRODUTTIVO SIDEBAR - ORA CONDIZIONALE ***

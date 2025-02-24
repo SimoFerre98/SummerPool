@@ -63,7 +63,7 @@ def visualizza_risultati_protetti():
     elif password_inserita:
         pass
     else:
-        st.info("Inserisci la password nel menu laterale per visualizzare i risultati.")
+        st.info("Inserisci la password per visualizzare i risultati.")
 
 if __name__ == "__main__":
     visualizza_risultati_protetti()
