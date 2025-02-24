@@ -1,0 +1,20 @@
+{
+    "utenti": {
+        "simo": "Simo",
+        "giulia": "Giulia"
+    },
+    "voti": {
+        "simo": {
+            "Albania": 4,
+            "Bangkock": 3,
+            "Islanda": 2,
+            "Puglia": 1
+        },
+        "giulia": {
+            "Baku": 4,
+            "Bangkock": 3,
+            "Amsterdam/Copenhagen": 2,
+            "Islanda": 1
+        }
+    }
+}

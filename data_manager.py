@@ -1,6 +1,6 @@
 import json
 
-DATABASE_FILE = "config.py" # Potremmo importare DATABASE_FILE da config.py, ma per semplicità lo ridefiniamo qui o importiamo config e usiamo config.DATABASE_FILE
+DATABASE_FILE = "database.json" # Potremmo importare DATABASE_FILE da config.py, ma per semplicità lo ridefiniamo qui o importiamo config e usiamo config.DATABASE_FILE
 
 def load_data():
     try:
