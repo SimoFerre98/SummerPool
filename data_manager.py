@@ -2,29 +2,15 @@ import json
 import threading
 import firebase_admin
 from firebase_admin import credentials, db
-import streamlit as st
-import tempfile
-import os
 
 # Percorso del file JSON locale
 DATABASE_FILE = "database.json"
 
-# Recupera i segreti da Streamlit e convertili in un dizionario standard
-firebase_secrets = dict(st.secrets["firebase"])
-
-# Crea un file temporaneo con le credenziali
-with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
-    json.dump(firebase_secrets, temp_file)  # Scrivi il dizionario nel file
-    temp_file_path = temp_file.name
-
-# Inizializza Firebase usando il percorso del file temporaneo
-cred = credentials.Certificate(temp_file_path)
+# Inizializzazione di Firebase (eseguita sempre all'avvio)
+cred = credentials.Certificate("firebase_credentials.json")
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://summerpool-default-rtdb.europe-west1.firebasedatabase.app/'
 })
-
-# Pulisci rimuovendo il file temporaneo
-os.remove(temp_file_path)
 
 def load_data():
     """Carica i dati dal file JSON locale."""
@@ -36,9 +22,12 @@ def load_data():
 
 def save_data(data):
     """Salva i dati nel file JSON locale e su Firebase in modo asincrono."""
+    # Salva i dati nel file JSON locale
     with open(DATABASE_FILE, "w") as f:
         json.dump(data, f, indent=4)
     print("Dati salvati nel file JSON locale.")
+
+    # Salva su Firebase in modo asincrono
     threading.Thread(target=save_to_firebase, args=(data,)).start()
 
 def save_to_firebase(data):
