@@ -9,8 +9,8 @@ import os
 # Percorso del file JSON locale
 DATABASE_FILE = "database.json"
 
-# Recupera i segreti da Streamlit
-firebase_secrets = st.secrets["firebase"]
+# Recupera i segreti da Streamlit e convertili in un dizionario standard
+firebase_secrets = dict(st.secrets["firebase"])
 
 # Crea un file temporaneo con le credenziali
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
