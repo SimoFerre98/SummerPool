@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import account
 import config
 import auth
 import voting
@@ -109,28 +109,15 @@ elif sezione_selezionata == "Impostazioni":
     if st.session_state.utente_registrato:
         st.subheader(f"Gestione profilo di {st.session_state.username}")
         
-        # Cambio password
-        with st.form(key="cambio_password"):
-            vecchia_password = st.text_input("Vecchia password", type="password")
-            nuova_password = st.text_input("Nuova password", type="password")
-            conferma_password = st.text_input("Conferma nuova password", type="password")
-            if st.form_submit_button("Cambia password"):
-                utenti = st.session_state.data["utenti"]
-                if utenti[st.session_state.username]["password"] == vecchia_password:
-                    if nuova_password == conferma_password:
-                        utenti[st.session_state.username]["password"] = nuova_password
-                        data_manager.save_data(st.session_state.data)
-                        st.success("✅ Password cambiata con successo!")
-                    else:
-                        st.error("❌ Le nuove password non corrispondono!")
-                else:
-                    st.error("❌ Vecchia password errata!")
+        # Cambio password (spostato in account.py, vedi sotto)
+        account.gestisci_cambio_password()
         
-        # Backup database
-        st.subheader("Backup Database")
-        if st.button("📥 Scarica database"):
-            with open("database.json", "r") as f:
-                json_data = f.read()
-            st.download_button("Scarica JSON", json_data, "database.json", "application/json")
+        # Backup database solo per l'utente "ferre"
+        if st.session_state.username == "ferre":
+            st.subheader("Backup Database")
+            if st.button("📥 Scarica database"):
+                with open("database.json", "r") as f:
+                    json_data = f.read()
+                st.download_button("Scarica JSON", json_data, "database.json", "application/json")
     else:
         st.warning("🚫 Devi essere loggato per accedere alle impostazioni!")

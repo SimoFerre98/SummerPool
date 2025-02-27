@@ -27,7 +27,7 @@ coordinate_destinazioni = {
     "Sicilia": (38.1156, 13.3613),
 }
 
-def visualizza_mappa(destinazioni):
+def visualizza_dettagli_destinazioni(destinazioni):
     st.subheader("🌍 Mappa delle Tue Destinazioni")
 
     # Creazione del DataFrame per la mappa
@@ -74,4 +74,4 @@ if __name__ == "__main__":
     st.title("Esplora i Tuoi Viaggi")
     st.write("Ecco una mappa interattiva con le destinazioni che ti piacerebbe visitare!")
     destinazioni = list(coordinate_destinazioni.keys())
-    visualizza_mappa(destinazioni)
+    visualizza_dettagli_destinazioni(destinazioni)
