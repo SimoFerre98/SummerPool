@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px  # Sostituiamo matplotlib con plotly per grafici interattivi
+import plotly.express as px
 from data_manager import load_data
 
 def calcola_voti_totali(data_voti):
@@ -10,47 +10,79 @@ def calcola_voti_totali(data_voti):
             voti_totali_calcolati[destinazione] = voti_totali_calcolati.get(destinazione, 0) + punti
     return voti_totali_calcolati
 
-def visualizza_risultati_protetti():
-    # Titolo con un tocco di stile
-    st.title("🏖️ Risultati del Sondaggio Vacanze")
+def calcola_frequenze_voto(data_voti):
+    frequenze = {}
+    for username in data_voti:
+        for destinazione in data_voti[username].keys():
+            frequenze[destinazione] = frequenze.get(destinazione, 0) + 1
+    return frequenze
 
-    # Carica i dati
+def visualizza_risultati_protetti():
+    st.title("🏖️ Risultati del Sondaggio Vacanze")
     st.session_state.data = load_data()
 
-    # Sezione Risultati Sondaggio
+    # Sezione Risultati Sondaggio (grafico dei punteggi totali)
     st.header("📊 Risultati del Sondaggio")
     voti_totali_attuali = calcola_voti_totali(st.session_state.data["voti"])
 
     if voti_totali_attuali:
-        # Crea un DataFrame per i risultati
         risultati_df = pd.DataFrame(list(voti_totali_attuali.items()), columns=['Destinazione', 'Punteggio'])
         risultati_df_ordinato = risultati_df.sort_values(by='Punteggio', ascending=False)
 
-        # Determina il vincitore
         vincitore_punteggio = risultati_df_ordinato['Punteggio'].max()
         vincitori_destinazioni = risultati_df_ordinato[risultati_df_ordinato['Punteggio'] == vincitore_punteggio]['Destinazione'].tolist()
 
-        # Grafico interattivo con Plotly
         fig = px.bar(
             risultati_df_ordinato,
             x='Destinazione',
             y='Punteggio',
-            color='Destinazione',  # Colori diversi per ogni barra
-            text=risultati_df_ordinato['Punteggio'],  # Mostra i punteggi sulle barre
+            color='Destinazione',
+            text=risultati_df_ordinato['Punteggio'],
             title="Punteggi per Destinazione",
             height=400
         )
-        fig.update_traces(textposition='auto')  # Posiziona il testo automaticamente
+        fig.update_traces(textposition='auto')
         fig.update_layout(
             xaxis_title="Destinazioni",
             yaxis_title="Punteggio Totale",
-            showlegend=False,  # Nasconde la legenda (ridondante con i colori)
-            bargap=0.2  # Spazio tra le barre
+            showlegend=False,
+            bargap=0.2
         )
         st.plotly_chart(fig, use_container_width=True)
 
-        # Evidenzia il vincitore
         st.markdown(f"**🏆 Destinazione/i vincitrice/i:** {', '.join(vincitori_destinazioni)} con **{vincitore_punteggio} punti**!")
+    else:
+        st.info("Nessun voto è stato ancora espresso.")
+
+    # Nuova sezione: Frequenze di Voto
+    st.header("📊 Frequenze di Voto per Destinazione")
+    frequenze_voto = calcola_frequenze_voto(st.session_state.data["voti"])
+
+    if frequenze_voto:
+        frequenze_df = pd.DataFrame(list(frequenze_voto.items()), columns=['Destinazione', 'Frequenza'])
+        frequenze_df_ordinato = frequenze_df.sort_values(by='Frequenza', ascending=False)
+
+        fig_frequenze = px.bar(
+            frequenze_df_ordinato,
+            x='Destinazione',
+            y='Frequenza',
+            color='Destinazione',
+            text=frequenze_df_ordinato['Frequenza'],
+            title="Frequenze di Voto per Destinazione",
+            height=400
+        )
+        fig_frequenze.update_traces(textposition='auto')
+        fig_frequenze.update_layout(
+            xaxis_title="Destinazioni",
+            yaxis_title="Numero di Voti",
+            showlegend=False,
+            bargap=0.2
+        )
+        st.plotly_chart(fig_frequenze, use_container_width=True)
+
+        max_frequenza = frequenze_df_ordinato['Frequenza'].max()
+        destinazioni_piu_votate = frequenze_df_ordinato[frequenze_df_ordinato['Frequenza'] == max_frequenza]['Destinazione'].tolist()
+        st.markdown(f"**🏆 Destinazione/i più votata/e:** {', '.join(destinazioni_piu_votate)} con **{max_frequenza} voti**!")
     else:
         st.info("Nessun voto è stato ancora espresso.")
 
@@ -63,22 +95,22 @@ def visualizza_risultati_protetti():
             voti_lista.append({"Username": username, "Destinazioni Votate": dest_votate})
         voti_df = pd.DataFrame(voti_lista)
 
-        # Stile per la tabella
         st.dataframe(
             voti_df.style.set_properties(**{
                 'background-color': '#f9f9f9',
                 'border-color': '#dddddd',
                 'padding': '5px',
                 'text-align': 'left'
-            }).set_table_styles([
-                {'selector': 'th', 'props': [('background-color', '#4CAF50'), ('color', 'white'), ('font-weight', 'bold')]}
-            ]),
+            }).set_table_styles([{
+                'selector': 'th',
+                'props': [('background-color', '#4CAF50'), ('color', 'white'), ('font-weight', 'bold')]
+            }]),
             use_container_width=True
         )
     else:
         st.info("Ancora nessun voto registrato.")
 
-    # Sezione Numero di Votanti
+    # Sezione Statistiche
     st.header("📈 Statistiche")
     num_utenti_votanti = len(st.session_state.data["voti"])
     st.markdown(f"**Numero di persone votanti:** {num_utenti_votanti}")

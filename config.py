@@ -5,4 +5,3 @@ DESTINAZIONI = [
     "Marocco", "Montenegro", "Mykonos", "Portogallo", "Puglia", "Sicilia"
 ]
 DESTINAZIONI.sort()
-PASSWORD_RISULTATI = "2502" # Definisci la password qui
