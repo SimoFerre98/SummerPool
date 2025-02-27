@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- DIZIONARIO COORDINATE ---
+# Dizionario delle coordinate
 coordinate_destinazioni = {
     "Albania": (41.3275, 19.8187),           # Tirana
     "Alicante/Benidorm": (38.5417, -0.1211), # Alicante
@@ -26,36 +26,10 @@ coordinate_destinazioni = {
     "Sicilia": (38.1156, 13.3613),           # Palermo
 }
 
-# --- DIZIONARIO IMMAGINI (LINK DIRETTI WIKIPEDIA COMMONS) ---
-url_immagini_destinazioni = {
-    "Albania": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/ALB_location_map.svg/400px-ALB_location_map.svg.png",
-    "Alicante/Benidorm": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Benidorm_Levante_beach_and_skyline.jpg/800px-Benidorm_Levante_beach_and_skyline.jpg",
-    "Amsterdam/Copenhagen": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Nyhavn_Copenhagen_Denmark.jpg/800px-Nyhavn_Copenhagen_Denmark.jpg",
-    "Andalucia": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Andalusia_in_Spain_%28location_map%29.svg/400px-Andalusia_in_Spain_%28location_map%29.svg.png",
-    "Baku": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Baku_Flame_Towers_and_skyline_at_night.jpg/800px-Baku_Flame_Towers_and_skyline_at_night.jpg",
-    "Bangkok": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Temple_of_Dawn_Bangkok_Thailand.jpg/800px-Temple_of_Dawn_Bangkok_Thailand.jpg",
-    "Corsica": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Corse-topo.svg/450px-Corse-topo.svg.png",
-    "Cipro": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Cyprus_%28location_map%29.svg/500px-Cyprus_%28location_map%29.svg.png",
-    "Egitto": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Egypt_location_map.svg/500px-Egypt_location_map.svg.png",
-    "Ibiza-Formentera": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Location_map_Ibiza.png/400px-Location_map_Ibiza.png",
-    "Islanda": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Iceland_location_map.svg/500px-Iceland_location_map.svg.png",
-    "Isole Faroe": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Location_Faroes.png/400px-Location_Faroes.png",
-    "Istanbul": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Turkey_location_map_Istanbul.svg/500px-Turkey_location_map_Istanbul.svg.png",
-    "Kos": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Greece_location_map_Kos.svg/400px-Greece_location_map_Kos.svg.png",
-    "Malta": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Malta_location_map.svg/500px-Malta_location_map.svg.png",
-    "Marocco": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Morocco_location_map.svg/500px-Morocco_location_map.svg.png",
-    "Montenegro": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Montenegro_location_map.svg/450px-Montenegro_location_map.svg.png",
-    "Mykonos": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Cyclades_location_map_Mykonos.svg/400px-Cyclades_location_map_Mykonos.svg.png",
-    "Portogallo": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Portugal_location_map.svg/500px-Portugal_location_map.svg.png",
-    "Puglia": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Puglia_in_Italy.svg/500px-Puglia_in_Italy.svg.png",
-    "Sicilia": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Sicilia_in_Italy.svg/500px-Sicilia_in_Italy.svg.png",
-}
-
 def visualizza_dettagli_destinazioni(destinazioni):
-    st.header("Mappa Interattiva delle Destinazioni")
-    st.write("Visualizza le posizioni di tutte le destinazioni sulla mappa:")
-
-    # Liste per costruire il DataFrame per st.map()
+    st.subheader("🌍 Mappa delle Destinazioni")
+    
+    # Creazione del DataFrame per la mappa
     lat_list = []
     lon_list = []
     nome_list = []
@@ -67,7 +41,6 @@ def visualizza_dettagli_destinazioni(destinazioni):
             lon_list.append(coords[1])
             nome_list.append(d)
 
-    # Creiamo il DataFrame per la mappa
     df = pd.DataFrame({
         'lat': lat_list,
         'lon': lon_list,
@@ -75,26 +48,15 @@ def visualizza_dettagli_destinazioni(destinazioni):
     })
 
     if not df.empty:
-        st.map(df, zoom=2)
+        st.map(df, zoom=2, use_container_width=True)
     else:
         st.write("Mappa non disponibile (nessuna coordinata definita).")
 
-    st.header("Dettagli e Immagini delle Destinazioni")
-    st.write("Esplora le immagini di ogni destinazione:")
+    # Link a Notion
+    st.markdown("📖 Per maggiori informazioni sulle destinazioni, consulta la nostra pagina Notion:")
+    st.markdown("[Vai a Notion](https://ferremede.notion.site/Vacanza-2k25-1a24febbe94a80f2900cfb614e5939f9?pvs=4)")  # Sostituisci con il tuo link reale
 
-    # Disposizione in 3 colonne
-    col3 = st.columns(3)
-    for i, d in enumerate(destinazioni):
-        with col3[i % 3]:
-            st.subheader(d)
-            url_immagine = url_immagini_destinazioni.get(d)
-            if url_immagine:
-                st.image(url_immagine, width=200)
-            else:
-                st.write("Immagine non disponibile")
-
-# --- ESEMPIO DI ESECUZIONE ---
 if __name__ == "__main__":
-    st.title("Test di Immagini da Wikipedia Commons")
+    st.title("Test Mappa")
     lista = list(coordinate_destinazioni.keys())
     visualizza_dettagli_destinazioni(lista)

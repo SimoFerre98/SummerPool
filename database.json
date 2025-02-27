@@ -1,4 +1,113 @@
 {
-    "utenti": {},
-    "voti": {}
+    "utenti": {
+        "ferre": {
+            "password": "Ferre"
+        },
+        "gabriele": {
+            "password": "gabriele"
+        },
+        "betti": {
+            "password": "betti"
+        },
+        "hachiroha": {
+            "password": "hachiroha"
+        },
+        "giu": {
+            "password": "giu"
+        },
+        "elena": {
+            "password": "elena"
+        },
+        "arilalala": {
+            "password": "arilalala"
+        },
+        "marta": {
+            "password": "marta"
+        },
+        "daniela": {
+            "password": "daniela"
+        },
+        "gegge": {
+            "password": "gegge"
+        },
+        "civa": {
+            "password": "civa"
+        }
+    },
+    "voti": {
+        "ferre": {
+            "Egitto": 4,
+            "Islanda": 3,
+            "Montenegro": 2,
+            "Portogallo": 1
+        },
+        "gabriele": {
+            "Egitto": 4,
+            "Sicilia": 3,
+            "Andalucia": 2,
+            "Alicante/Benidorm": 1
+        },
+        "betti": {
+            "Ibiza-Formentera": 4,
+            "Mykonos": 3,
+            "Kos": 2,
+            "Portogallo": 1
+        },
+        "hachiroha": {
+            "Islanda": 4,
+            "Ibiza-Formentera": 3,
+            "Mykonos": 2,
+            "Isole Faroe": 1
+        },
+        "giu": {
+            "Ibiza-Formentera": 4,
+            "Mykonos": 3,
+            "Egitto": 2,
+            "Alicante/Benidorm": 1
+        },
+        "elena": {
+            "Sicilia": 4,
+            "Andalucia": 3,
+            "Mykonos": 2,
+            "Alicante/Benidorm": 1
+        },
+        "arilalala": {
+            "Albania": 4,
+            "Islanda": 3,
+            "Portogallo": 2,
+            "Montenegro": 1
+        },
+        "marta": {
+            "Corsica": 4,
+            "Albania": 3,
+            "Kos": 2,
+            "Puglia": 1
+        },
+        "daniela": {
+            "Albania": 4,
+            "Portogallo": 3,
+            "Montenegro": 2,
+            "Sicilia": 1
+        },
+        "gegge": {
+            "Andalucia": 4,
+            "Islanda": 3,
+            "Ibiza-Formentera": 2,
+            "Mykonos": 1
+        },
+        "civa": {
+            "Sicilia": 4,
+            "Albania": 3,
+            "Egitto": 2,
+            "Islanda": 1
+        }
+    },
+    "disponibilita": {
+        "ferre": [
+            [
+                "2025-06-01",
+                "2025-09-30"
+            ]
+        ]
+    }
 }
