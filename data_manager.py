@@ -2,12 +2,13 @@ import json
 import threading
 import firebase_admin
 from firebase_admin import credentials, db
+import streamlit as st
 
 # Percorso del file JSON locale
 DATABASE_FILE = "database.json"
 
-# Inizializzazione di Firebase (eseguita sempre all'avvio)
-cred = credentials.Certificate("firebase_credentials.json")
+# Inizializzazione di Firebase con i segreti di Streamlit
+cred = credentials.Certificate(st.secrets["firebase"])
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://summerpool-default-rtdb.europe-west1.firebasedatabase.app/'
 })
@@ -22,12 +23,9 @@ def load_data():
 
 def save_data(data):
     """Salva i dati nel file JSON locale e su Firebase in modo asincrono."""
-    # Salva i dati nel file JSON locale
     with open(DATABASE_FILE, "w") as f:
         json.dump(data, f, indent=4)
     print("Dati salvati nel file JSON locale.")
-
-    # Salva su Firebase in modo asincrono
     threading.Thread(target=save_to_firebase, args=(data,)).start()
 
 def save_to_firebase(data):
