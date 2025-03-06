@@ -139,7 +139,7 @@ elif sezione_selezionata == "Impostazioni":
             # Gestione visibilità risultati nuova votazione
             st.subheader("Gestione Visibilità Risultati Nuova Votazione")
             if "utenti_autorizzati_nuovi_voti" not in st.session_state.data:
-                st.session_state.data["utenti_autorizzati_nuovi_voti"] = ["ferre"]  # Default: solo admin
+                st.session_state.data["utenti_autorizzati_nuovi_voti"] = ["ferre"]
             utenti_registrati = list(st.session_state.data["utenti"].keys())
             utenti_autorizzati = st.multiselect(
                 "Seleziona chi può vedere i risultati della nuova votazione:",
@@ -150,5 +150,23 @@ elif sezione_selezionata == "Impostazioni":
                 st.session_state.data["utenti_autorizzati_nuovi_voti"] = utenti_autorizzati
                 data_manager.save_data(st.session_state.data)
                 st.success("Lista degli utenti autorizzati aggiornata!")
+
+            # Visualizzazione username e password (solo per ferre)
+            st.subheader("Elenco Utenti Registrati (Admin)")
+            utenti_lista = [{"Username": username, "Password": info["password"]} 
+                            for username, info in st.session_state.data["utenti"].items()]
+            utenti_df = pd.DataFrame(utenti_lista)
+            st.dataframe(
+                utenti_df.style.set_properties(**{
+                    'background-color': '#f9f9f9',
+                    'border-color': '#dddddd',
+                    'padding': '5px',
+                    'text-align': 'left'
+                }).set_table_styles([{
+                    'selector': 'th',
+                    'props': [('background-color', '#4CAF50'), ('color', 'white'), ('font-weight', 'bold')]
+                }]),
+                use_container_width=True
+            )
     else:
         st.warning("🚫 Devi essere loggato per accedere alle impostazioni!")

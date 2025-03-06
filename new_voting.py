@@ -32,6 +32,11 @@ def visualizza_nuova_votazione():
                 if destinazione in st.session_state.nuove_destinazioni_selezionate:
                     st.session_state.nuove_destinazioni_selezionate.remove(destinazione)
 
+    # Controlla se l'utente ha selezionato più di 2 destinazioni
+    if len(st.session_state.nuove_destinazioni_selezionate) > 2:
+        st.warning("Attenzione: puoi selezionare solo 2 destinazioni. Verranno considerate solo le prime 2 selezionate.")
+
+    # Limita a 2 destinazioni
     nuove_selezionate = st.session_state.nuove_destinazioni_selezionate[:2]
 
     if nuove_selezionate:
@@ -39,6 +44,7 @@ def visualizza_nuova_votazione():
         for dest in nuove_selezionate:
             st.write(f"- {dest}")
 
+    # Pulsante per confermare i voti
     if st.button("Conferma Nuova Votazione"):
         if nuove_selezionate:
             st.session_state.data["nuovi_voti"][st.session_state.username] = nuove_selezionate
@@ -46,3 +52,14 @@ def visualizza_nuova_votazione():
             st.success("Nuovi voti registrati con successo!")
         else:
             st.warning("Seleziona almeno una destinazione per la nuova votazione.")
+
+    # Pulsante per resettare i voti
+    if st.button("🔄 Resetta i tuoi voti"):
+        # Cancella le selezioni correnti
+        st.session_state.nuove_destinazioni_selezionate = []
+        # Rimuovi i voti dell'utente dai dati salvati
+        if st.session_state.username in st.session_state.data["nuovi_voti"]:
+            del st.session_state.data["nuovi_voti"][st.session_state.username]
+            save_data(st.session_state.data)
+        st.success("I tuoi voti sono stati resettati con successo!")
+        st.rerun()  # Ricarica la pagina per aggiornare le checkbox
