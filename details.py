@@ -52,7 +52,7 @@ def visualizza_dettagli_destinazioni(destinazioni):
             size_max=15,
             projection="natural earth",
         )
-        fig.update_traces(marker=dict(size=12, color="#FF6B6B", symbol="circle"))  # Colore rosso corallo per i marker
+        fig.update_traces(marker=dict(size=12, color="#FF6B6B", symbol="circle"))  # Marker rosso corallo
         fig.update_layout(
             geo=dict(
                 showland=True,
@@ -66,7 +66,7 @@ def visualizza_dettagli_destinazioni(destinazioni):
     else:
         st.write("Nessuna destinazione valida da mostrare sulla mappa.")
 
-    # Aggiunta di un link opzionale
+    # Link opzionale a Notion
     st.markdown("📖 Vuoi più dettagli? Consulta la nostra pagina Notion: [Vai a Notion](https://www.notion.so/Esempio-Destinazioni-Vacanze)")
 
 # Esecuzione
